@@ -22,7 +22,7 @@ private struct URLConstructor {
 final class APIService {
     private let jsonDecoder = JSONDecoder()
     private let headers = ["Accept": "application/vnd.github.v3+json",
-                           "Authorization": "Bearer cd8201f77968141799dabb422004a61e76fd993f"]
+                           "Authorization": "Bearer YOURS-JWT-TOKEN"]
     
     func search(with query: String, completion: @escaping (UserListElement?) -> Void ) {
         guard let searchQuery = URLConstructor().constructSearchUrl(with: query) else { return }
