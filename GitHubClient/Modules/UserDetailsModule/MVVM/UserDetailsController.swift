@@ -24,14 +24,13 @@ class UserDetailsControllerView: UIViewController, Storyboarded {
                 cell.item = evm
             })
             
-            self.tableView.dataSource = self.dataSource
-            self.tableView.delegate = self.dataSource
-            self.tableView.reloadData()
+            tableView.dataSource = self.dataSource
+            tableView.delegate = self.dataSource
+            tableView.reloadData()
             
-            self.dataSource.cellPressed = { index in
-                if let url = URL(string: self.items[index].htmlURL!) {
-                    UIApplication.shared.open(url)
-                }
+            dataSource.cellPressed = { index in
+                guard let url = self.items[index].htmlURL else { return }
+                self.coordinator!.openGithubPageInSafari(with: url)
             }
         }
     }

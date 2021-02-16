@@ -61,6 +61,12 @@ class MainCoordinator: Coordinator {
         }
     }
     
+    func openGithubPageInSafari(with urlString: String) {
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
+        }
+    }
+    
     func start(stratrgy: DisplayStrategy) {
         coordinatorFabric(strategy: stratrgy)
     }
