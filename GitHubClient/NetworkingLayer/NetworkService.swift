@@ -7,25 +7,46 @@
 import Foundation
 import PromiseKit
 
-private struct URLConstructor {
-    func constructSearchUrl(with param: String) -> URL? {
+enum URLTarget {
+   case user(String)
+   case repos(String)
+   case search(String)
+}
+
+struct URLConstructor {
+    private func constructSearchUrl(with param: String) -> URL? {
         return URL(string: "https://api.github.com/search/users?q=\(param)")
     }
-    func constructUserUrl(with param: String) -> URL? {
+    
+    private func constructUserUrl(with param: String) -> URL? {
         return URL(string: "https://api.github.com/users/\(param)")
     }
-    func constructReposUrl(with param: String) -> URL? {
+    
+    private func constructReposUrl(with param: String) -> URL? {
         return URL(string: "https://api.github.com/users/\(param)/repos")
+    }
+    
+    func getURL(for target: URLTarget) -> URL? {
+        switch target {
+        case .repos(let repoName):
+            return constructReposUrl(with: repoName)
+        case .search(let query):
+            return constructSearchUrl(with: query)
+        case .user(let userName):
+           return constructUserUrl(with: userName)
+        }
     }
 }
 
 final class APIService {
+    
     private let jsonDecoder = JSONDecoder()
     private let headers = ["Accept": "application/vnd.github.v3+json",
-                           "Authorization": "Bearer YOURS-JWT-TOKEN"]
+                           "Authorization": "Bearer 4584b3d66252ae6e0f90e2f3a8b911470e2be4e4"]
+    private let urlConstructor = URLConstructor()
     
     func search(with query: String, completion: @escaping (UserListElement?) -> Void ) {
-        guard let searchQuery = URLConstructor().constructSearchUrl(with: query) else { return }
+        guard let searchQuery = urlConstructor.getURL(for: .search(query)) else { return }
         firstly {
             Alamofire
                 .request(searchQuery, method: .get, parameters: nil, headers: headers)
@@ -37,29 +58,15 @@ final class APIService {
             completion(nil)
         }
     }
-    
-    private func getUser(by name: String, completion: @escaping (UserInfo?) -> () )  {
-        guard let query = URLConstructor().constructUserUrl(with: name) else { return }
+   
+    func getData<T: Decodable>(for name: String, target: URLTarget, completion: @escaping (T?) -> () ) {
+        guard let query = urlConstructor.getURL(for: target) else { return }
         firstly {
             Alamofire
                 .request(query, method: .get, parameters: nil,headers: headers)
-                .responseDecodable(UserInfo.self)
+                .responseDecodable(T.self)
         }.done { user in
             completion(user)
-        }.catch { error in
-            print(error)
-            completion(nil)
-        }
-    }
-    
-    func getRepos(for username: String, completion: @escaping ([Repo]?) -> () )  {
-        guard let query = URLConstructor().constructReposUrl(with: username) else { return }
-        firstly {
-            Alamofire
-                .request(query, method: .get, parameters: nil,headers: headers)
-                .responseDecodable([Repo].self)
-        }.done { repos in
-            completion(repos)
         }.catch { error in
             print(error)
             completion(nil)
@@ -72,12 +79,12 @@ final class APIService {
         let myGroup = DispatchGroup()
         for name in userNames {
             myGroup.enter()
-            self.getUser(by: name, completion: { user in
+            self.getData(for: name, target: .user(name)) { (user: UserInfo?) in
                 if user != nil {
                     result.append(user!)
                 }
                 myGroup.leave()
-            })
+            }
         }
         myGroup.notify(queue: .main) {
             print("Finished all Users requests.")

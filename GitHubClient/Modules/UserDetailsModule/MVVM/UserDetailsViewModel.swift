@@ -26,12 +26,12 @@ class UserDetailsViewModel : NSObject {
         }
     }
     
-    func loadRepos(for user: String) {
-        service.getRepos(for: user, completion: {  result in
-            if result != nil {
-                self.repoData = result
-                self.searchDataListener(result!)
+    func loadRepos(for name: String) {
+        service.getData(for: name, target: .repos(name)) { (repos: Repos?) in
+            if repos != nil {
+                self.repoData = repos
+                self.searchDataListener(repos!)
             }
-        })
+        }
     }
 }
