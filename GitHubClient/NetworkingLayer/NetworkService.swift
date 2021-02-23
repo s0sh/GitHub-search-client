@@ -42,7 +42,7 @@ final class APIService {
     
     private let jsonDecoder = JSONDecoder()
     private let headers = ["Accept": "application/vnd.github.v3+json",
-                           "Authorization": "Bearer "]
+                           "Authorization": "Bearer 1c90b6c35bf1e9d0d7f4a567473fa06b0a602987"]
     private let urlConstructor = URLConstructor()
     
     func search(with query: String, completion: @escaping (UserListElement?) -> Void ) {
@@ -59,7 +59,7 @@ final class APIService {
         }
     }
    
-    func getData<T: Decodable>(for name: String, target: URLTarget, completion: @escaping (T?) -> () ) {
+    func getData<T: Decodable>(target: URLTarget, completion: @escaping (T?) -> () ) {
         guard let query = urlConstructor.getURL(for: target) else { return }
         firstly {
             Alamofire
@@ -79,7 +79,7 @@ final class APIService {
         let myGroup = DispatchGroup()
         for name in userNames {
             myGroup.enter()
-            self.getData(for: name, target: .user(name)) { (user: UserInfo?) in
+            self.getData(target: .user(name)) { (user: UserInfo?) in
                 if user != nil {
                     result.append(user!)
                 }

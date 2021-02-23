@@ -27,7 +27,7 @@ class UserDetailsViewModel : NSObject {
     }
     
     func loadRepos(for name: String) {
-        service.getData(for: name, target: .repos(name)) { (repos: Repos?) in
+        service.getData(target: .repos(name)) { (repos: Repos?) in
             if repos != nil {
                 self.repoData = repos
                 self.searchDataListener(repos!)
