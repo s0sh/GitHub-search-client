@@ -16,12 +16,17 @@ class SearchViewModel : NSObject {
     }
     
     func searching(for searchQueue: String) {
-        service.search(with: searchQueue) { (result) in
+        service.search(with: searchQueue) { [weak self] (result) in
+            guard let strongSelf = self else { return }
             if let res = result {
-                self.service.fetchUsers(using: res.items, completion: { (users) in
-                    self.searchDataListener(Array(users))
+                strongSelf.service.fetchUsers(using: res.items, completion: { (users) in
+                    strongSelf.searchDataListener(Array(users))
                 })
            }
         }
+    }
+    
+    deinit {
+        print("[SEARCH VM] No memory leaks/retain cicles. All bottlenecks covered properly!")
     }
 }

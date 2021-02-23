@@ -21,16 +21,17 @@ class UserDetailsControllerView: UIViewController, Storyboarded {
             self.dataSource = GenericTableViewDataSource(cellIdentifier: "RepoCell",
                                                          items: items,
                                                          configureCell: { (cell, evm) in
-                cell.item = evm
-            })
+                                                            cell.item = evm
+                                                         })
             
             tableView.dataSource = self.dataSource
             tableView.delegate = self.dataSource
             tableView.reloadData()
             
-            dataSource.cellPressed = { index in
-                guard let url = self.items[index].htmlURL else { return }
-                self.coordinator!.openGithubPageInSafari(with: url)
+            dataSource.cellPressed = { [weak self] index in
+                guard let strongSelf = self else { return }
+                guard let url = strongSelf.items[index].htmlURL else { return }
+                strongSelf.coordinator!.openGithubPageInSafari(with: url)
             }
         }
     }
@@ -46,13 +47,22 @@ class UserDetailsControllerView: UIViewController, Storyboarded {
     }
     
     private func setup() {
+        
         viewModel = UserDetailsViewModel()
         viewModel.loadRepos(for: userInfo.login)
-        searchView.searchStringUpdated = { searchQueue in
-            self.viewModel.searching(for: searchQueue)
+        
+        searchView.searchStringUpdated = { [weak self] searchQueue in
+            guard let strongSelf = self else { return }
+            strongSelf.viewModel.searching(for: searchQueue)
         }
-        self.viewModel.searchDataListener = { searchResult in
-            self.items = searchResult
+        
+        self.viewModel.searchDataListener = { [weak self] searchResult in
+            guard let strongSelf = self else { return }
+            strongSelf.items = searchResult
         }
+    }
+    
+    deinit {
+        print("No memory leaks/retain cicles. All bottlenecks covered properly!")
     }
 }

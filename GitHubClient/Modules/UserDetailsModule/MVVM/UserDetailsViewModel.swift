@@ -27,10 +27,11 @@ class UserDetailsViewModel : NSObject {
     }
     
     func loadRepos(for name: String) {
-        service.getData(target: .repos(name)) { (repos: Repos?) in
+        service.getData(target: .repos(name)) { [weak self] (repos: Repos?) in
+            guard let strongSelf = self else { return }
             if repos != nil {
-                self.repoData = repos
-                self.searchDataListener(repos!)
+                strongSelf.repoData = repos
+                strongSelf.searchDataListener(repos!)
             }
         }
     }

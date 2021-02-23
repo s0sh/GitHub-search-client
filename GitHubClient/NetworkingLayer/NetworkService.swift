@@ -63,7 +63,7 @@ final class APIService {
         guard let query = urlConstructor.getURL(for: target) else { return }
         firstly {
             Alamofire
-                .request(query, method: .get, parameters: nil,headers: headers)
+                .request(query, method: .get, parameters: nil, headers: headers)
                 .responseDecodable(T.self)
         }.done { user in
             completion(user)
