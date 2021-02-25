@@ -42,7 +42,7 @@ final class APIService {
     
     private let jsonDecoder = JSONDecoder()
     private let headers = ["Accept": "application/vnd.github.v3+json",
-                           "Authorization": "Bearer a4fc9eb9449980f78d054bd3e1454926d2e35dc1"]
+                           "Authorization": "Bearer "]
     private let urlConstructor = URLConstructor()
     
     func search(with query: String, completion: @escaping (UserListElement?) -> Void ) {
