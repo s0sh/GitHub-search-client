@@ -24,7 +24,7 @@ class GitHubClientTests: XCTestCase {
             guard let strongSelf = searchViewModel else { return }
             if let res = result {
                 strongSelf.service.fetchUsers(using: res.items, completion: { (data) in
-                    XCTAssertEqual(data.count, 0, "items must be > than 0")
+                    XCTAssertEqual(data.count, 0, "items count must be > than 0")
                 })
            }
         }

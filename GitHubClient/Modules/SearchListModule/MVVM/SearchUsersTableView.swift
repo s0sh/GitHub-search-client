@@ -27,7 +27,7 @@ class SearchListControllerView: GenericTableViewController<UserListItemCell, Use
             strongSelf.viewModel.searching(for: searchQueue)
         }
         
-        self.viewModel.searchDataListener = { [weak self] searchResult in
+        viewModel.searchDataListener = { [weak self] searchResult in
             guard let strongSelf = self else { return }
             strongSelf.items = searchResult
         }
